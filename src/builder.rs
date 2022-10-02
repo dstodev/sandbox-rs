@@ -52,8 +52,8 @@ mod tests {
 	fn builder_is_not_setter() {
 		/* Builder methods are not setters.
 		 */
-		let mut o = Object::new();  // First hint: linter states o should not be marked mut
-		o.value(1);
+		let mut o = Object::new();  // First hint: linter informs o does not need to be mut
+		o.value(1);  // Second hint: linter warns that returned value is discarded
 		// assert_eq!(1, o.value);  // This will not compile: Borrow of moved value: `o`
 	}
 
