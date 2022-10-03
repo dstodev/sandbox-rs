@@ -5,7 +5,7 @@ impl Object {
 		Self
 	}
 
-	fn immutable_borrow(&self) { }
+	fn immutable_borrow(&self) {}
 	fn mutable_borrow(&mut self) {}
 	fn consume(self) {}
 }
