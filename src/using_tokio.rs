@@ -1,4 +1,3 @@
-use std::ops::Deref;
 use std::sync::{Arc, Mutex, MutexGuard};
 
 use tokio::runtime::Runtime;
@@ -32,7 +31,7 @@ mod tests {
 	#[test]
 	fn simple_runtime() {
 		let rt = get_runtime();
-		let fired = Safe::<bool>::new(false);
+		let fired = Safe::new(false);
 		assert!(!*fired.get());
 		rt.block_on(async {
 			fired.set(true);
