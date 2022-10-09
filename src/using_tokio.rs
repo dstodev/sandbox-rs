@@ -1,21 +1,22 @@
+use std::ops::Deref;
 use std::sync::{Arc, Mutex, MutexGuard};
 
 use tokio::runtime::Runtime;
 
-struct Flag {
-	value: Arc<Mutex<bool>>,
+struct Safe<T> {
+	value: Arc<Mutex<T>>,
 }
 
-impl Flag {
-	fn new() -> Self {
+impl<T> Safe<T> {
+	fn new(value: T) -> Self {
 		Self {
-			value: Arc::new(Mutex::new(false))
+			value: Arc::new(Mutex::new(value))
 		}
 	}
-	fn set(&self, new_value: bool) {
+	fn set(&self, new_value: T) {
 		*self.get() = new_value;
 	}
-	fn get(&self) -> MutexGuard<bool> {
+	fn get(&self) -> MutexGuard<T> {
 		self.value.lock().unwrap()
 	}
 }
@@ -31,7 +32,7 @@ mod tests {
 	#[test]
 	fn simple_runtime() {
 		let rt = get_runtime();
-		let fired = Flag::new();
+		let fired = Safe::<bool>::new(false);
 		assert!(!*fired.get());
 		rt.block_on(async {
 			fired.set(true);
