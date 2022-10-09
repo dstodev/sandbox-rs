@@ -118,7 +118,7 @@ mod tests {
 		let closure = || {  // closure implements Fn() (inferred)
 			o.immutable_borrow();
 		};
-		invoke_fnonce(closure);  // How is this working?
+		invoke_fnonce(closure);
 		invoke_fnmut(closure);
 		invoke_fn(closure);
 	}

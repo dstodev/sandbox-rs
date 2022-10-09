@@ -74,7 +74,7 @@ mod tests {
 				interior.value = 1;
 				assert_eq!(1, interior.value);
 			}
-			Err(guard) => panic!("Mutex was poisoned!"),
+			Err(_guard) => panic!("Mutex was poisoned!"),
 		};
 	}
 }
