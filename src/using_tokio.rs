@@ -2,26 +2,46 @@ use std::sync::{Arc, Mutex, MutexGuard};
 
 use tokio::runtime::Runtime;
 
+//#[derive(Clone)]  derived version implements clone() returning &Self instead of Self
 struct Safe<T> {
 	value: Arc<Mutex<T>>,
 }
 
+impl<T> Clone for Safe<T> {
+	fn clone(&self) -> Self {
+		Self {
+			value: self.value.clone(),
+		}
+	}
+}
+
 impl<T> Safe<T> {
+	/// Wraps `value` in a ref-counted thread-safe mutex. As long as the returned instance
+	/// or a handle() of this instance is alive, the owned memory is valid and accessible
+	/// via `get()` and `set()`.
 	fn new(value: T) -> Self {
 		Self {
 			value: Arc::new(Mutex::new(value))
 		}
 	}
-	fn set(&self, new_value: T) {
-		*self.get() = new_value;
-	}
-	fn get(&self) -> MutexGuard<T> {
+	fn lock(&self) -> MutexGuard<T> {
 		self.value.lock().unwrap()
+	}
+	fn handle(&self) -> Self {
+		self.clone()
+	}
+}
+
+impl<T> Safe<T> where T: Clone {
+	fn view(&self) -> T {
+		self.lock().clone()
 	}
 }
 
 #[cfg(test)]
 mod tests {
+	use tokio::task::JoinHandle;
+
 	use super::*;
 
 	fn get_runtime() -> Runtime {
@@ -32,10 +52,77 @@ mod tests {
 	fn simple_runtime() {
 		let rt = get_runtime();
 		let fired = Safe::new(false);
-		assert!(!*fired.get());
+
+		assert!(!fired.view());
+
 		rt.block_on(async {
-			fired.set(true);
+			*fired.lock() = true;
 		});
-		assert!(*fired.get());
+
+		assert!(fired.view());
+	}
+
+	#[test]
+	fn simple_runtime_move() {
+		let rt = get_runtime();
+		let fired = Safe::new(false);
+		let handle = fired.handle();
+
+		rt.block_on(async move {
+			*handle.lock() = true;
+		});
+
+		assert!(fired.view());
+	}
+
+	#[test]
+	fn multiple_workers_mutate_in_place() {
+		let rt = get_runtime();
+		let counter = Safe::new(0);
+
+		let make_adder_task = |incr| {
+			let handle = counter.handle();
+			rt.spawn(async move {
+				/* The mutex `lock` is locked for the duration of the task to avoid TOCTOU errors.
+					Once locked, the lock can be used where the underlying type can,
+					except sometimes explicitly dereferenced like `*lock`.
+
+					In test output, note that the order by which numbers are added
+					is random but the counter maintains continuity between each add:
+
+					adding 1 + 0 = 1  // order: This set adds in-order: +1 then +2 then +3
+					adding 2 + 1 = 3  // continuity: The right-hand operand of each row
+					adding 3 + 3 = 6  //             is the result of the previous row
+					-----
+					adding 1 + 6 = 7    // order: This set adds out-of-order: +1 then +3 then +2
+					adding 3 + 7 = 10   // continuity: The right-hand operand of each row
+					adding 2 + 10 = 12  //             is the result of the previous row
+	            */
+				let mut lock = handle.lock();
+				println!("adding {} + {} = {}", incr, *lock, incr + *lock);
+				*lock += incr;
+			})
+		};
+
+		let iterations = 10;
+		let sum_of_adders = 6;
+
+		/* [x..y), [x..=y] */
+		for i in 1..=iterations {
+			println!("-----");
+
+			let running_handles: Vec<JoinHandle<_>> = vec![
+				make_adder_task(1),
+				make_adder_task(2),
+				make_adder_task(3),
+				// Sum of adders is 6
+			];
+
+			for task in &running_handles {
+				while !task.is_finished() { /* Tasks will complete on their own. Wait here... */ }
+			}
+			assert_eq!(i * sum_of_adders, counter.view());
+		}
+		assert_eq!(iterations * sum_of_adders, counter.view());
 	}
 }
