@@ -17,8 +17,7 @@ impl<T> Clone for Safe<T> {
 
 impl<T> Safe<T> {
 	/// Wraps `value` in a ref-counted thread-safe mutex. As long as the returned instance
-	/// or a handle() of this instance is alive, the owned memory is valid and accessible
-	/// via `get()` and `set()`.
+	/// or a handle() of this instance is alive, the owned instance is alive.
 	fn new(value: T) -> Self {
 		Self {
 			value: Arc::new(Mutex::new(value))
