@@ -80,7 +80,7 @@ mod tests {
 		let rt = get_runtime();
 		let counter = Safe::new(0);
 
-		let make_adder_task = |incr| {
+		let start_adder_task = |incr| {
 			let handle = counter.handle();
 			rt.spawn(async move {
 				/* The mutex `lock` is locked for the duration of the task to avoid TOCTOU errors.
@@ -112,9 +112,9 @@ mod tests {
 			println!("-----");
 
 			let running_handles: Vec<JoinHandle<_>> = vec![
-				make_adder_task(1),
-				make_adder_task(2),
-				make_adder_task(3),
+				start_adder_task(1),  // This task will usually lock the mutex first
+				start_adder_task(2),
+				start_adder_task(3),
 				// Sum of adders is 6
 			];
 
