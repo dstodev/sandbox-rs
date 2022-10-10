@@ -40,8 +40,6 @@ impl<T> Safe<T> where T: Clone {
 
 #[cfg(test)]
 mod tests {
-	use tokio::task::JoinHandle;
-
 	use super::*;
 
 	fn get_runtime() -> Runtime {
@@ -90,16 +88,16 @@ mod tests {
 					In test output, note that the order by which numbers are added
 					is random but the counter maintains continuity between each add:
 
-					adding 1 + 0 = 1  // order: This set adds in-order: +1 then +2 then +3
-					adding 2 + 1 = 3  // continuity: The right-hand operand of each row
-					adding 3 + 3 = 6  //             is the result of the previous row
+					1 + 0 = 1  // order: This set adds in-order: +1 then +2 then +3
+					2 + 1 = 3  // continuity: The right-hand operand of each row
+					3 + 3 = 6  //             is the result of the previous row
 					-----
-					adding 1 + 6 = 7    // order: This set adds out-of-order: +1 then +3 then +2
-					adding 3 + 7 = 10   // continuity: The right-hand operand of each row
-					adding 2 + 10 = 12  //             is the result of the previous row
+					1 + 6 = 7    // order: This set adds out-of-order: +1 then +3 then +2
+					3 + 7 = 10   // continuity: The right-hand operand of each row
+					2 + 10 = 12  //             is the result of the previous row
 	            */
 				let mut lock = handle.lock();
-				println!("adding {} + {} = {}", incr, *lock, incr + *lock);
+				println!("{} + {} = {}", incr, *lock, incr + *lock);
 				*lock += incr;
 			})
 		};
@@ -111,14 +109,14 @@ mod tests {
 		for i in 1..=iterations {
 			println!("-----");
 
-			let running_handles: Vec<JoinHandle<_>> = vec![
+			let running_tasks = vec![
 				start_adder_task(1),  // This task will usually lock the mutex first
 				start_adder_task(2),
 				start_adder_task(3),
 				// Sum of adders is 6
 			];
 
-			for task in &running_handles {
+			for task in &running_tasks {
 				while !task.is_finished() { /* Tasks will complete on their own. Wait here... */ }
 			}
 			assert_eq!(i * sum_of_adders, counter.view());
