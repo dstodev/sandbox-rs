@@ -4,30 +4,33 @@
    - single-producer, single-consumer (tokio::sync::oneshot)
    - single-producer, multi-consumer  (tokio::sync::watch)
 */
-use tokio::sync::oneshot::channel;
 
 #[cfg(test)]
 mod tests {
-	use super::*;
-
 	#[tokio::test]
 	async fn oneshot() {
-		let (tx, rx) = channel::<i32>();  // ::<> Turbofish! ::<>
+		let value_to_send = 1;
+		let (tx, rx) = tokio::sync::oneshot::channel::<i32>();  // ::<> Turbofish! ::<>
 
 		let receiver = tokio::spawn(async move {
+			println!("rx.await");
 			match rx.await {
-				Ok(value) => assert_eq!(1, value),
+				Ok(value) => {
+					println!("rx received {}", value);
+					assert_eq!(value_to_send, value);
+				}
 				Err(_) => panic!("Sender was dropped!"),
 			}
 		});
 
 		tokio::spawn(async move {
-			if let Err(_) = tx.send(1) {
+			println!("tx.send({})", value_to_send);
+			if let Err(_) = tx.send(value_to_send) {
 				panic!("Receiver was dropped!")
 			}
 		});
 
+		println!("awaiting receiver");
 		receiver.await.unwrap();
-
 	}
 }
