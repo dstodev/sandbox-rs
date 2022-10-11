@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex, MutexGuard};
 
 use tokio::runtime::Runtime;
 
-//#[derive(Clone)]  derived version implements clone() returning &Self instead of Self
+//#[derive(Clone)]  derived version implements clone() returning &Self instead of Self (?)
 struct Safe<T> {
 	value: Arc<Mutex<T>>,
 }
@@ -89,12 +89,12 @@ mod tests {
 
 					1 + 0 = 1  // order: This set adds in-order: +1 then +2 then +3
 					2 + 1 = 3  // continuity: The right-hand operand of each row
-					3 + 3 = 6  //             is the result of the previous row
+					3 + 3 = 6                 is the result of the previous row
 					-----
 					1 + 6 = 7    // order: This set adds out-of-order: +1 then +3 then +2
 					3 + 7 = 10   // continuity: The right-hand operand of each row
-					2 + 10 = 12  //             is the result of the previous row
-	            */
+					2 + 10 = 12                 is the result of the previous row
+				*/
 				let mut lock = handle.lock();
 				println!("{} + {} = {}", incr, *lock, incr + *lock);
 				*lock += incr;
@@ -116,8 +116,9 @@ mod tests {
 			];
 
 			for task in &running_tasks {
-				while !task.is_finished() { /* Tasks will complete on their own. Wait here... */ }
+				while !task.is_finished() { /* Tasks are running. Wait here... */ }
 			}
+
 			assert_eq!(i * sum_of_adders, counter.view());
 		}
 		assert_eq!(iterations * sum_of_adders, counter.view());
