@@ -48,21 +48,21 @@ mod tests {
 		// The same nonce should never be used between two messages, especially if the messages
 		// have the same content.
 
-		let client_encrypted = client_box.encrypt(&nonce, &plaintext[..]).unwrap();
-		let server_encrypted = server_box.encrypt(&nonce, &plaintext[..]).unwrap();
+		let client_encrypted = client_box.encrypt(&nonce, plaintext.as_slice()).unwrap();
+		let server_encrypted = server_box.encrypt(&nonce, plaintext.as_slice()).unwrap();
 
 		// Using the same nonce, both boxes encrypt and produce the same ciphertext:
 		assert_eq!(client_encrypted, server_encrypted);
 
 		// Boxes can decrypt ciphertext encrypted by the opposite box:
-		let server_decrypted = server_box.decrypt(&nonce, &client_encrypted[..]).unwrap();
-		let client_decrypted = client_box.decrypt(&nonce, &server_encrypted[..]).unwrap();
+		let server_decrypted = server_box.decrypt(&nonce, &*client_encrypted).unwrap();
+		let client_decrypted = client_box.decrypt(&nonce, &*server_encrypted).unwrap();
 		assert_eq!(server_decrypted, client_decrypted);  // Decrypted text is the same
 		assert_eq!(plaintext, server_decrypted.as_slice());  // and equal to the plaintext
 
 		// Boxes can decrypt ciphertext that they themselves encrypted:
-		let client_decrypted = client_box.decrypt(&nonce, &client_encrypted[..]).unwrap();
-		let server_decrypted = server_box.decrypt(&nonce, &server_encrypted[..]).unwrap();
+		let client_decrypted = client_box.decrypt(&nonce, &*client_encrypted).unwrap();
+		let server_decrypted = server_box.decrypt(&nonce, &*server_encrypted).unwrap();
 		assert_eq!(server_decrypted, client_decrypted);  // Decrypted text is the same
 		assert_eq!(plaintext, server_decrypted.as_slice());  // and equal to the plaintext
 	}
