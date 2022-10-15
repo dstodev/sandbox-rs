@@ -1,7 +1,5 @@
 use std::sync::{Arc, Mutex, MutexGuard};
 
-use tokio::runtime::Runtime;
-
 //#[derive(Clone)]  derived version implements clone() returning &Self instead of Self (?)
 struct Safe<T> {
 	value: Arc<Mutex<T>>,
@@ -39,6 +37,8 @@ impl<T> Safe<T> where T: Clone {
 
 #[cfg(test)]
 mod tests {
+	use tokio::runtime::Runtime;
+
 	use super::*;
 
 	#[test]
