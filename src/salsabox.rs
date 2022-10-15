@@ -58,12 +58,12 @@ mod tests {
 		let server_decrypted = server_box.decrypt(&nonce, &*client_encrypted).unwrap();
 		let client_decrypted = client_box.decrypt(&nonce, &*server_encrypted).unwrap();
 		assert_eq!(server_decrypted, client_decrypted);  // Decrypted text is the same
-		assert_eq!(plaintext, server_decrypted.as_slice());  // and equal to the plaintext
+		assert_eq!(plaintext, &*server_decrypted);  // and equal to the plaintext
 
 		// Boxes can decrypt ciphertext that they themselves encrypted:
 		let client_decrypted = client_box.decrypt(&nonce, &*client_encrypted).unwrap();
 		let server_decrypted = server_box.decrypt(&nonce, &*server_encrypted).unwrap();
 		assert_eq!(server_decrypted, client_decrypted);  // Decrypted text is the same
-		assert_eq!(plaintext, server_decrypted.as_slice());  // and equal to the plaintext
+		assert_eq!(plaintext, &*server_decrypted);  // and equal to the plaintext
 	}
 }
