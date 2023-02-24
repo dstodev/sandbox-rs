@@ -2,6 +2,8 @@ struct Object {
 	value: i32,
 }
 
+// This is a builder, an example of typestate programming:
+// https://docs.rust-embedded.org/book/static-guarantees/typestate-programming.html
 impl Object {
 	pub fn new() -> Self {
 		Self {
