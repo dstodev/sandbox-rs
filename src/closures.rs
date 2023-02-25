@@ -13,7 +13,7 @@ mod tests {
 	#[test]
 	fn move_closure() {
 		let value = Unit;
-		let print_value = move || println!("{}", value);  // Ownership moves on this line
+		let print_value = move || println!("{}", value); // Ownership moves on this line
 
 		// println!("Value before move: {}", value);  // Cannot read moved variable
 
@@ -23,7 +23,7 @@ mod tests {
 	#[test]
 	fn reference_closure() {
 		let value = Unit;
-		let print_value = || println!("{}", value);  // Ownership does not move
+		let print_value = || println!("{}", value); // Ownership does not move
 
 		println!("Value before move: {}", value);
 

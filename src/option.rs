@@ -14,10 +14,10 @@ mod tests {
 
 		// Adds twice to assert the variables are not moved during the operation
 		// These cannot be move-closures; captures accumulator by mutable reference
-		some.as_ref().map(|unit| accumulator += unit.value);  // adds 10
-		some.as_ref().map(|unit| accumulator += unit.value);  // adds 10
+		some.as_ref().map(|unit| accumulator += unit.value); // adds 10
+		some.as_ref().map(|unit| accumulator += unit.value); // adds 10
 
-		none.as_ref().map(|unit| accumulator += unit.value);  // adds 0 (variable is None)
+		none.as_ref().map(|unit| accumulator += unit.value); // adds 0 (variable is None)
 
 		assert_eq!(20, accumulator);
 	}
@@ -27,8 +27,8 @@ mod tests {
 		let mut some = Some(Unit { value: 10 });
 
 		// These can be move-closures; captures nothing from environment
-		some.as_mut().map(|unit| unit.value += unit.value);  // adds 10 => 20
-		some.as_mut().map(|unit| unit.value += unit.value);  // adds 20 => 40
+		some.as_mut().map(|unit| unit.value += unit.value); // adds 10 => 20
+		some.as_mut().map(|unit| unit.value += unit.value); // adds 20 => 40
 
 		assert_eq!(40, some.unwrap().value);
 	}

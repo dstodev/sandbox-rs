@@ -4,10 +4,12 @@ struct Unit {
 }
 
 impl Unit {
-	pub fn get_a(&self) -> i32 {  // pub
+	pub fn get_a(&self) -> i32 {
+		// pub
 		self.a
 	}
-	fn get_b(&self) -> i32 {  // not pub
+	fn get_b(&self) -> i32 {
+		// not pub
 		self.b
 	}
 }

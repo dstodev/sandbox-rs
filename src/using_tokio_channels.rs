@@ -10,7 +10,7 @@ mod tests {
 	#[tokio::test]
 	async fn oneshot() {
 		let value_to_send = 1;
-		let (tx, rx) = tokio::sync::oneshot::channel::<i32>();  // ::<> Turbofish! ::<>
+		let (tx, rx) = tokio::sync::oneshot::channel::<i32>(); // ::<> Turbofish! ::<>
 
 		let receiver = tokio::spawn(async move {
 			println!("rx.await");

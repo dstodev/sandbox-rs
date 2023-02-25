@@ -17,7 +17,10 @@ impl KeyPair {
 
 #[cfg(test)]
 mod tests {
-	use crypto_box::{aead::{Aead, AeadCore}, SalsaBox};
+	use crypto_box::{
+		aead::{Aead, AeadCore},
+		SalsaBox,
+	};
 	use once_cell::sync::OnceCell;
 
 	use super::*;
@@ -27,8 +30,7 @@ mod tests {
 
 	impl KeyPair {
 		fn get_client_server_keys() -> (&'static Self, &'static Self) {
-			(Self::get_singleton(&CLIENT),
-			 Self::get_singleton(&SERVER))
+			(Self::get_singleton(&CLIENT), Self::get_singleton(&SERVER))
 		}
 		fn get_singleton(cell: &'static OnceCell<KeyPair>) -> &'static Self {
 			cell.get_or_init(|| Self::new())
@@ -57,13 +59,13 @@ mod tests {
 		// Boxes can decrypt ciphertext encrypted by the opposite box:
 		let server_decrypted = server_box.decrypt(&nonce, &*client_encrypted).unwrap();
 		let client_decrypted = client_box.decrypt(&nonce, &*server_encrypted).unwrap();
-		assert_eq!(server_decrypted, client_decrypted);  // Decrypted text is the same
-		assert_eq!(plaintext, &*server_decrypted);  // and equal to the plaintext
+		assert_eq!(server_decrypted, client_decrypted); // Decrypted text is the same
+		assert_eq!(plaintext, &*server_decrypted); // and equal to the plaintext
 
 		// Boxes can decrypt ciphertext that they themselves encrypted:
 		let client_decrypted = client_box.decrypt(&nonce, &*client_encrypted).unwrap();
 		let server_decrypted = server_box.decrypt(&nonce, &*server_encrypted).unwrap();
-		assert_eq!(server_decrypted, client_decrypted);  // Decrypted text is the same
-		assert_eq!(plaintext, &*server_decrypted);  // and equal to the plaintext
+		assert_eq!(server_decrypted, client_decrypted); // Decrypted text is the same
+		assert_eq!(plaintext, &*server_decrypted); // and equal to the plaintext
 	}
 }

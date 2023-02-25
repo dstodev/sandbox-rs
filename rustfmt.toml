@@ -1,0 +1,8 @@
+# Iteration 1
+# More configuration options: https://rust-lang.github.io/rustfmt/
+
+hard_tabs = true
+
+group_imports = "StdExternalCrate"
+imports_granularity = "Crate"
+imports_layout = "HorizontalVertical"

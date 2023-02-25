@@ -18,7 +18,7 @@ impl<T> Safe<T> {
 	/// or a handle() of this instance is alive, the owned instance is alive.
 	fn new(value: T) -> Self {
 		Self {
-			value: Arc::new(Mutex::new(value))
+			value: Arc::new(Mutex::new(value)),
 		}
 	}
 	fn lock(&self) -> MutexGuard<T> {
@@ -29,7 +29,10 @@ impl<T> Safe<T> {
 	}
 }
 
-impl<T> Safe<T> where T: Clone {
+impl<T> Safe<T>
+where
+	T: Clone,
+{
 	fn view(&self) -> T {
 		self.lock().clone()
 	}
@@ -77,24 +80,24 @@ mod tests {
 			let handle = counter.handle();
 			rt.spawn(async move {
 				/* The mutex `lock` is locked for the duration of the task to avoid TOCTOU errors.
-				     Once locked, the lock can be used where the underlying type can,
-				     except sometimes explicitly dereferenced like `*lock`.
+				   Once locked, the lock can be used where the underlying type can,
+				   except sometimes explicitly dereferenced like `*lock`.
 
-				     In test output, note that the order by which numbers are added
-				     is random but the counter maintains continuity between each add:
+				   In test output, note that the order by which numbers are added
+				   is random but the counter maintains continuity between each add:
 
-				     1 + 0 = 1  // order: This set adds in-order: +1 then +2 then +3
-				     2 + 1 = 3  // continuity: The right-hand operand of each row
-				     3 + 3 = 6                 is the result of the previous row
-				     -----
-				     1 + 6 = 7    // order: This set adds out-of-order: +1 then +3 then +2
-				     3 + 7 = 10   // continuity: The right-hand operand of each row
-				     2 + 10 = 12                 is the result of the previous row
+				   1 + 0 = 1  // order: This set adds in-order: +1 then +2 then +3
+				   2 + 1 = 3  // continuity: The right-hand operand of each row
+				   3 + 3 = 6                 is the result of the previous row
+				   -----
+				   1 + 6 = 7    // order: This set adds out-of-order: +1 then +3 then +2
+				   3 + 7 = 10   // continuity: The right-hand operand of each row
+				   2 + 10 = 12                 is the result of the previous row
 				*/
 				let mut lock = handle.lock();
 				println!("{} + {} = {}", incr, *lock, incr + *lock);
 				*lock += incr;
-			})  // returns a JoinHandle
+			}) // returns a JoinHandle
 		};
 
 		let iterations = 10;
@@ -105,7 +108,7 @@ mod tests {
 			println!();
 
 			let running_tasks = vec![
-				start_adder_task(1),  // This task will usually lock the mutex first
+				start_adder_task(1), // This task will usually lock the mutex first
 				start_adder_task(2),
 				start_adder_task(3),
 				// Sum of adders is 6

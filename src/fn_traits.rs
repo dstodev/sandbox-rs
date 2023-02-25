@@ -10,23 +10,31 @@ impl Object {
 	fn consume(self) {}
 }
 
-/*
-	Fn implements FnMut implements FnOnce
+/* Fn implements FnMut implements FnOnce
 
-	Fn:     Callable repeatedly, can not mutate state. Captures are immutably borrowed.
-	FnMut:  Callable repeatedly, can mutate state.     Captures are immutably or mutably borrowed.
-	FnOnce: Callable once, can or cannot mutate state. Captures are immutably or mutably borrowed, or consumed.
- */
+   Fn:     Callable repeatedly, can not mutate state. Captures are immutably borrowed.
+   FnMut:  Callable repeatedly, can mutate state.     Captures are immutably or mutably borrowed.
+   FnOnce: Callable once, can or cannot mutate state. Captures are immutably or mutably borrowed, or consumed.
+*/
 
-fn invoke_fnonce<F>(callable: F) where F: FnOnce() {
+fn invoke_fnonce<F>(callable: F)
+where
+	F: FnOnce(),
+{
 	callable();
 }
 
-fn invoke_fnmut<F>(mut callable: F) where F: FnMut() {
+fn invoke_fnmut<F>(mut callable: F)
+where
+	F: FnMut(),
+{
 	callable();
 }
 
-fn invoke_fn<F>(callable: F) where F: Fn() {
+fn invoke_fn<F>(callable: F)
+where
+	F: Fn(),
+{
 	callable();
 }
 
@@ -80,7 +88,8 @@ mod tests {
 	#[test]
 	fn capture_mutably() {
 		let mut o = Object::new();
-		let mut closure = || {  // Must be mut
+		let mut closure = || {
+			// Must be mut
 			o.immutable_borrow();
 			o.mutable_borrow();
 		};
@@ -103,10 +112,11 @@ mod tests {
 	#[test]
 	fn capture_owning_mutably() {
 		let mut o = Object::new();
-		let closure = || {  // Not mut because the compiler understands it is consumed
+		let closure = || {
+			// Not mut because the compiler understands it is consumed
 			o.immutable_borrow();
-			o.mutable_borrow();  // Even though its capture borrows mutably
-			o.consume();  // Must be consumed if closure not mut
+			o.mutable_borrow(); // Even though its capture borrows mutably
+			o.consume(); // Must be consumed if closure not mut
 		};
 		closure();
 		//closure();
@@ -115,7 +125,8 @@ mod tests {
 	#[test]
 	fn passing_immutable_closure() {
 		let o = Object::new();
-		let closure = || {  // closure implements Fn() (inferred)
+		let closure = || {
+			// closure implements Fn() (inferred)
 			o.immutable_borrow();
 		};
 		invoke_fnonce(closure);
@@ -126,7 +137,8 @@ mod tests {
 	#[test]
 	fn passing_mutable_closure() {
 		let mut o = Object::new();
-		let mut closure = || {  // closure implements FnMut (inferred)
+		let mut closure = || {
+			// closure implements FnMut (inferred)
 			o.immutable_borrow();
 			o.mutable_borrow();
 		};
@@ -138,7 +150,8 @@ mod tests {
 	#[test]
 	fn passing_owning_closure() {
 		let o = Object::new();
-		let closure = || {  // closure implements FnOnce() (inferred)
+		let closure = || {
+			// closure implements FnOnce() (inferred)
 			o.immutable_borrow();
 			//o.mutable_borrow();
 			o.consume();
@@ -151,7 +164,8 @@ mod tests {
 	#[test]
 	fn passing_owning_closure_affecting_environment() {
 		let mut o = Object::new();
-		let closure = || {  // closure implements FnOnce() (inferred)
+		let closure = || {
+			// closure implements FnOnce() (inferred)
 			o.immutable_borrow();
 			o.mutable_borrow();
 			o.consume();
