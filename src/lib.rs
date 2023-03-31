@@ -1,9 +1,9 @@
 #![allow(dead_code)]
 
-mod arcmutex;
 mod builder;
 mod closures;
 mod fn_traits;
+mod interior_mutability;
 mod option;
 mod salsabox;
 mod string_join;

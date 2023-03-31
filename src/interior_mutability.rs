@@ -11,9 +11,9 @@ impl Object {
 }
 
 /* Arc<Mutex<T>> gives type T "Interior Mutability" with additional thread-safety;
-   "Arc" stands for "Atomically Reference Counted"
-   Related type Rc<T> exists which is not atomic and not thread-safe.
-   However, reference-counting atomically is more computationally expensive.
+   - "Arc" stands for "Atomically Reference Counted"
+   - Related type Rc<T> exists which is not atomic and not thread-safe.
+   - However, reference-counting atomically is more computationally expensive.
 */
 type ArcMutex<T> = Arc<Mutex<T>>;
 
@@ -21,11 +21,13 @@ type MagicObject = ArcMutex<Object>;
 
 /* Implementing this trait lets us construct a MagicObject like:
 
-   let o = MagicObject::from(Object::new());
-   or
-   let o: MagicObject = Object::new().into();
+	   let o = MagicObject::from(Object::new());
 
-   trait Into<U> for T is implemented automatically by impl From<T> for U
+   or
+
+	   let o: MagicObject = Object::new().into();
+
+   `Into<U> for T` is implemented automatically by `From<T> for U`
 */
 impl From<Object> for MagicObject {
 	fn from(o: Object) -> Self {

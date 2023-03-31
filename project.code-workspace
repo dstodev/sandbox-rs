@@ -1,0 +1,28 @@
+{
+	"folders": [
+		{
+			"name": "project",
+			"path": ".",
+		}
+	],
+	"settings": {
+		"[markdown]": {
+			"editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
+			"editor.insertSpaces": true,
+			"editor.renderWhitespace": "boundary",
+			"editor.tabSize": 2,
+			"files.trimTrailingWhitespace": false,
+		},
+		"markdownlint.config": {
+			// https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+			"default": true,
+			"MD010": { // Hard tabs
+				"code_blocks": false, // Allow tabs in code blocks
+			},
+			"MD013": { // Line length
+				"tables": false, // Allow long tables
+			}
+		},
+		"rewrap.wrappingColumn": 80,
+	}
+}

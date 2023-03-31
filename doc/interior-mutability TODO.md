@@ -1,0 +1,2 @@
+- Easily visualizable as a constant pointer to mutable data
+- Allows "immutable" types to mutate internally
