@@ -21,7 +21,7 @@ fn main() {
 
 ## Providing Behavior
 
-Structs can be provided behaviors, [such as a constructor.](idiomatic-struct-construction.md)
+Structs can be provided behaviors, [*such as a constructor.*](idiomatic-struct-construction.md)
 To do so, use the `impl` keyword:
 
 ```rust

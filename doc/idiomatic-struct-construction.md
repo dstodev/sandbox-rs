@@ -23,7 +23,7 @@ fn main() {
 
 `new()` returns `Self`; `Self` is shorthand to mean "the current class" i.e.
 `MyData` in this case. The function body of `new` is simply an inline
-instantiation of the type, which is [implicitly returned.](implicit-return.md)
+instantiation of the type, which is [*implicitly returned.*](implicit-return.md)
 
 So, the above constructor is equivalent to:
 

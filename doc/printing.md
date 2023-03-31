@@ -23,4 +23,4 @@ Can use `format!()` to create formatted strings without printing them
 ```
 
 `c` is explicitly a `String` to show that `format!()` returns an owning data
-type--the `String` type [owns its string contents.](ownership.md)
+type--the `String` type [*owns its string contents.*](ownership.md)
